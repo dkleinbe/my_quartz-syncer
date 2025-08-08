@@ -101,14 +101,14 @@ export class GithubSettings extends PluginSettingTab {
 	 */
 	updateConnectionStatus = async () => {
 		const oktokit = new Octokit({
-			auth: this.settings.settings.githubToken,
+			auth: this.plugin.localStorage.getPassword(),
 		});
 
 		try {
 			const response = await oktokit.request(
 				"GET /repos/{owner}/{repo}",
 				{
-					owner: this.settings.settings.githubUserName,
+					owner: this.plugin.localStorage.getUsername(),
 					repo: this.settings.settings.githubRepo,
 				},
 			);
@@ -217,7 +217,7 @@ export class GithubSettings extends PluginSettingTab {
 	 */
 	private initializeGitHubRepoSetting() {
 		new Setting(this.settingsRootElement)
-			.setName("Repository name")
+			.setName("My Repository name")
 			.setDesc("The name of your Quartz repository on GitHub.")
 			.addText((text) =>
 				text
@@ -245,9 +245,9 @@ export class GithubSettings extends PluginSettingTab {
 			.addText((text) =>
 				text
 					.setPlaceholder("username")
-					.setValue(this.settings.settings.githubUserName)
+					.setValue(this.plugin.localStorage.getUsername() ?? "")
 					.onChange(async (value) => {
-						this.settings.settings.githubUserName = value;
+						this.plugin.localStorage.setUsername(value);
 						await this.checkConnectionAndSaveSettings();
 					}),
 			);
@@ -262,7 +262,7 @@ export class GithubSettings extends PluginSettingTab {
 
 		desc.createEl("span", undefined, (span) => {
 			span.innerText =
-				'A GitHub access token with "contents" permissions. You can find instructions to generate it in ';
+				'A GitHub access token with "contents" permissions. You will not see it again here. You can find instructions to generate it in ';
 
 			span.createEl("a", undefined, (link) => {
 				link.href =
@@ -277,9 +277,9 @@ export class GithubSettings extends PluginSettingTab {
 			.addText((text) =>
 				text
 					.setPlaceholder("Secret Token")
-					.setValue(this.settings.settings.githubToken)
+					//.setValue(this.plugin.localStorage.getPassword() ??"") // TODO: remove this, don't show passwd
 					.onChange(async (value) => {
-						this.settings.settings.githubToken = value;
+						this.plugin.localStorage.setPassword(value);
 						await this.checkConnectionAndSaveSettings();
 					}),
 			);

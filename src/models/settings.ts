@@ -7,8 +7,8 @@ import { ILogLevel } from "js-logger";
 export default interface QuartzSyncerSettings {
 	/** GitHub settings */
 	githubRepo: string;
-	githubUserName: string;
-	githubToken: string;
+	githubUserName?: string;
+	githubToken?: string;
 	vaultPath: string;
 
 	/** Quartz settings */

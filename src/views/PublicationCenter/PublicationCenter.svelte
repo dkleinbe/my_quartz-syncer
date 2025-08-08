@@ -29,7 +29,12 @@
 	 * It is built from the publish status and updated reactively.
 	 */
 	async function getPublishStatus() {
-		publishStatus = await publishStatusManager.getPublishStatus(controller);
+		try {
+			publishStatus = await publishStatusManager.getPublishStatus(controller);
+		} catch {
+			console.error("Can't get publish status")
+			controller.setText("Can't get publish status, check github credential")
+		}
 	}
 
 	onMount(getPublishStatus);

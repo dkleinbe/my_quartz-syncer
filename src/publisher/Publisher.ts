@@ -137,12 +137,17 @@ export default class Publisher {
 		if (filePaths.length === 0) {
 			return true;
 		}
-
+		// check for non empty username & token
+		const uname: string | null = this.plugin.localStorage.getUsername()
+		const token: string | null = this.plugin.localStorage.getPassword()
+		if (uname === null || token === null)
+			return false;
+		
 		try {
 			const userQuartzConnection = new RepositoryConnection({
 				quartzRepository: this.settings.githubRepo,
-				githubUserName: this.settings.githubUserName,
-				githubToken: this.settings.githubToken,
+				githubUserName: uname,
+				githubToken: token,
 				contentFolder: this.settings.contentFolder,
 				vaultPath: this.settings.vaultPath,
 			});
@@ -182,12 +187,17 @@ export default class Publisher {
 		if (filesToPublish.length === 0) {
 			return true;
 		}
-
+		// check for non empty username & token
+		const uname: string | null = this.plugin.localStorage.getUsername()
+		const token: string | null = this.plugin.localStorage.getPassword()
+		if (uname === null || token === null)
+			return false;
+		
 		try {
 			const userQuartzConnection = new RepositoryConnection({
 				quartzRepository: this.settings.githubRepo,
-				githubUserName: this.settings.githubUserName,
-				githubToken: this.settings.githubToken,
+				githubUserName: uname,
+				githubToken: token,
 				contentFolder: this.settings.contentFolder,
 				vaultPath: this.settings.vaultPath,
 			});
