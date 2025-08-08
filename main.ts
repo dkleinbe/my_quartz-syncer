@@ -437,6 +437,7 @@ export default class QuartzSyncer extends Plugin {
 
 				await this.saveSettings();
 				await this.datastore.persister.clear();
+				await this.datastore.dropOutdatedCache();
 			}
 		}
 	}

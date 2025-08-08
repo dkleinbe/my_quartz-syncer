@@ -1,7 +1,7 @@
 {
 	"id": "my_quartz-syncer",
 	"name": "My Quartz Syncer",
-	"version": "10.8.9",
+	"version": "10.8.10",
 	"minAppVersion": "10.8.10",
 	"description": "Manage and publish your notes to Quartz, the fast, batteries-included static-site generator.",
 	"author": "D K",
