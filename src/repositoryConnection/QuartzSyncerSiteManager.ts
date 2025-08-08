@@ -5,6 +5,7 @@ import {
 	RepositoryConnection,
 	TRepositoryContent,
 } from "src/repositoryConnection/RepositoryConnection";
+import { LocalStorageSettings } from "src/models/LocalStorageSettings";
 
 /**
  * PathRewriteRule interface.
@@ -43,24 +44,35 @@ type ContentTreeItem = {
 export default class QuartzSyncerSiteManager {
 	settings: QuartzSyncerSettings;
 	metadataCache: MetadataCache;
+	localStorage: LocalStorageSettings
 	baseSyncerConnection: RepositoryConnection;
 	userSyncerConnection: RepositoryConnection;
 
-	constructor(metadataCache: MetadataCache, settings: QuartzSyncerSettings) {
+	constructor(metadataCache: MetadataCache, settings: QuartzSyncerSettings, localStorage: LocalStorageSettings) {
 		this.settings = settings;
 		this.metadataCache = metadataCache;
+		this.localStorage = localStorage
 
+				// check for non empty username & token
+		const uname: string | null = this.localStorage.getUsername()
+		const token: string | null = this.localStorage.getPassword()
+		
+		if (uname === null || token === null) { 
+			throw new Error("Github credential not set") 
+		}
+		// TODO: DKL add try/catch
 		this.baseSyncerConnection = new RepositoryConnection({
-			githubToken: settings.githubToken,
+			githubToken: token,
 			githubUserName: "saberzero1",
 			quartzRepository: "quartz",
 			contentFolder: "content",
 			vaultPath: "/",
 		});
 
+		// TODO: DKL add try/catch
 		this.userSyncerConnection = new RepositoryConnection({
-			githubToken: settings.githubToken,
-			githubUserName: settings.githubUserName,
+			githubToken: token,
+			githubUserName: uname,
 			quartzRepository: settings.githubRepo,
 			contentFolder: settings.contentFolder,
 			vaultPath: settings.vaultPath,

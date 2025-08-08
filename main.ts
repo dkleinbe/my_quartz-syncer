@@ -9,7 +9,7 @@ import QuartzSyncerSiteManager from "src/repositoryConnection/QuartzSyncerSiteMa
 import { QuartzSyncerSettingTab } from "./src/views/QuartzSyncerSettingTab";
 import { DataStore } from "src/publishFile/DataStore";
 import Logger from "js-logger";
-
+import { LocalStorageSettings } from "./src/models/LocalStorageSettings";
 /**
  * QuartzSyncer plugin settings.
  * @remarks
@@ -18,8 +18,8 @@ import Logger from "js-logger";
 const DEFAULT_SETTINGS: QuartzSyncerSettings = {
 	/** GitHub settings */
 	githubRepo: "quartz",
-	githubUserName: "",
-	githubToken: "",
+	//githubUserName: "",
+	//githubToken: "",
 	vaultPath: "/",
 
 	/** Quartz settings */
@@ -130,6 +130,7 @@ export default class QuartzSyncer extends Plugin {
 
 	publishModal!: PublicationCenter;
 
+	localStorage = new LocalStorageSettings(this);
 	/**
 	 * Called when the plugin is loaded.
 	 * Initializes the plugin, loads settings, and sets up commands and icons.
@@ -137,7 +138,10 @@ export default class QuartzSyncer extends Plugin {
 	async onload() {
 		this.appVersion = this.manifest.version;
 
+		this.localStorage.migrate();
+		
 		await this.loadSettings();
+		await this.migrateSettings();
 
 		if (this.settings.logLevel) Logger.setLevel(this.settings.logLevel);
 
@@ -222,6 +226,23 @@ export default class QuartzSyncer extends Plugin {
 		await this.saveData(this.settings);
 	}
 
+	/**
+	 * Migirate credential from regular settings to localstorate
+	 * DKL
+	 */
+    async migrateSettings(): Promise<void> {
+
+        if (this.settings.githubUserName !== undefined) {
+            this.localStorage.setUsername(this.settings.githubUserName);
+            this.settings.githubUserName = undefined;
+            await this.saveSettings();
+        }
+        if (this.settings.githubToken !== undefined) {
+            this.localStorage.setPassword(this.settings.githubToken);
+            this.settings.githubToken = undefined;
+            await this.saveSettings();
+        }		
+    }
 	/**
 	 * Adds commands to the plugin.
 	 * These commands can be triggered from the command palette or ribbon icon.
@@ -474,32 +495,39 @@ export default class QuartzSyncer extends Plugin {
 	 */
 	openPublishModal() {
 		if (!this.publishModal) {
-			const siteManager = new QuartzSyncerSiteManager(
-				this.app.metadataCache,
-				this.settings,
-			);
+			try {
+				const siteManager = new QuartzSyncerSiteManager(
+					this.app.metadataCache,
+					this.settings,
+					this.localStorage
+				);
 
-			const publisher = new Publisher(
-				this.app,
-				this,
-				this.app.vault,
-				this.app.metadataCache,
-				this.settings,
-				this.datastore,
-			);
+				const publisher = new Publisher(
+					this.app,
+					this,
+					this.app.vault,
+					this.app.metadataCache,
+					this.settings,
+					this.datastore,
+				);
 
-			const publishStatusManager = new PublishStatusManager(
-				siteManager,
-				publisher,
-			);
+				const publishStatusManager = new PublishStatusManager(
+					siteManager,
+					publisher,
+				);
 
-			this.publishModal = new PublicationCenter(
-				this.app,
-				publishStatusManager,
-				publisher,
-				siteManager,
-				this.settings,
-			);
+				this.publishModal = new PublicationCenter(
+					this.app,
+					publishStatusManager,
+					publisher,
+					siteManager,
+					this.settings,
+				);
+
+			} catch(error) {
+				console.error(error)
+			}
+
 		}
 		this.publishModal.open();
 	}
