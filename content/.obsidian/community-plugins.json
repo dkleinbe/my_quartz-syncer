@@ -3,5 +3,6 @@
   "hot-reload",
   "obsidian-excalidraw-plugin",
   "dataview",
-  "quartz-syncer"
+  "quartz-syncer",
+  "my_quartz-syncer"
 ]

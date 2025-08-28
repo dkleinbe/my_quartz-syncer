@@ -527,6 +527,10 @@ export default class QuartzSyncer extends Plugin {
 
 			} catch(error) {
 				console.error(error)
+				if (error instanceof Error) {
+					new Notice("Quartz syncer: something went wrong: " + error.message,2000);
+				}
+				return;
 			}
 
 		}
