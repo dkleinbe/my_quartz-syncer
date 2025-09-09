@@ -44,22 +44,27 @@ type ContentTreeItem = {
 export default class QuartzSyncerSiteManager {
 	settings: QuartzSyncerSettings;
 	metadataCache: MetadataCache;
-	localStorage: LocalStorageSettings
+	localStorage: LocalStorageSettings;
 	baseSyncerConnection: RepositoryConnection;
 	userSyncerConnection: RepositoryConnection;
 
-	constructor(metadataCache: MetadataCache, settings: QuartzSyncerSettings, localStorage: LocalStorageSettings) {
+	constructor(
+		metadataCache: MetadataCache,
+		settings: QuartzSyncerSettings,
+		localStorage: LocalStorageSettings,
+	) {
 		this.settings = settings;
 		this.metadataCache = metadataCache;
-		this.localStorage = localStorage
+		this.localStorage = localStorage;
 
-				// check for non empty username & token
-		const uname: string | null = this.localStorage.getUsername()
-		const token: string | null = this.localStorage.getPassword()
-		
-		if (uname === null || token === null) { 
-			throw new Error("Github credential not set") 
+		// check for non empty username & token
+		const uname: string | null = this.localStorage.getUsername();
+		const token: string | null = this.localStorage.getPassword();
+
+		if (uname === null || token === null) {
+			throw new Error("Github credential not set");
 		}
+
 		// TODO: DKL add try/catch
 		this.baseSyncerConnection = new RepositoryConnection({
 			githubToken: token,

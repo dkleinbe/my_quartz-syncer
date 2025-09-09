@@ -1,5 +1,5 @@
 ---
-publish: true
+publish: false
 ---
 This Subfolder has been rewritten before the rule to rewrite the Path Rewriting folder to root
 

@@ -2,6 +2,7 @@ import { AutoCardLinkCompiler } from "./plugins/AutoCardLinkCompiler";
 import { DataviewCompiler } from "src/compiler/plugins/DataviewCompiler";
 import { DatacoreCompiler } from "./plugins/DatacoreCompiler";
 import { FantasyStatblocksCompiler } from "./plugins/FantasyStatblocksCompiler";
+import { EmbedCodeCompiler } from "./plugins/EmbedCodeCompiler";
 import { TCompilerStep } from "src/compiler/SyncerPageCompiler";
 import { PublishFile } from "src/publishFile/PublishFile";
 import { App } from "obsidian";
@@ -12,7 +13,8 @@ type IntegrationTarget = {
 		| typeof AutoCardLinkCompiler
 		| typeof DataviewCompiler
 		| typeof DatacoreCompiler
-		| typeof FantasyStatblocksCompiler;
+		| typeof FantasyStatblocksCompiler
+		| typeof EmbedCodeCompiler;
 	enabled: boolean;
 };
 
@@ -46,6 +48,10 @@ export class PluginCompiler {
 			{
 				compiler: FantasyStatblocksCompiler,
 				enabled: this.settings.useFantasyStatblocks,
+			},
+			{
+				compiler: EmbedCodeCompiler,
+				enabled: this.settings.useEmbedCodeFile, // TODO: this.settings.useEmbedCode,
 			},
 		];
 	};

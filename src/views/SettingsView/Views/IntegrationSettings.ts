@@ -5,6 +5,7 @@ import { isPluginEnabled } from "src/utils/utils";
 import {
 	AUTO_CARD_LINK_PLUGIN_ID,
 	DATACORE_PLUGIN_ID,
+	EMBED_CODE_FILE_ID,
 	DATAVIEW_PLUGIN_ID,
 	FANTASY_STATBLOCKS_PLUGIN_ID,
 } from "src/ui/suggest/constants";
@@ -42,6 +43,7 @@ export class IntegrationSettings extends PluginSettingTab {
 
 		this.initializePluginIntegrationHeader();
 		this.initializeAutoCardLinkSetting();
+		this.initializeEmbedCodeFileSetting();
 		this.initializeDataviewSetting();
 		this.initializeDatacoreSetting();
 		this.initializeExcalidrawSetting();
@@ -133,6 +135,38 @@ export class IntegrationSettings extends PluginSettingTab {
 			);
 	}
 
+	/**
+	 * Initializes the Embed Code setting.
+	 * This method creates a toggle for enabling/disabling Dataview integration.
+	 * It checks if the Dataview plugin is enabled and updates the settings accordingly.
+	 */
+	private initializeEmbedCodeFileSetting() {
+		const emdedCodeFileEnabled = isPluginEnabled(EMBED_CODE_FILE_ID);
+
+		new Setting(this.settingsRootElement)
+			.setName("Enable Embed Code File integration")
+			.setDesc("Converts embedded code files to markdown.")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(
+						this.settings.settings.useEmbedCodeFile &&
+							emdedCodeFileEnabled,
+					)
+					.setDisabled(!emdedCodeFileEnabled)
+					.onChange(async (value) => {
+						this.settings.settings.useEmbedCodeFile =
+							value && emdedCodeFileEnabled;
+						await this.settings.plugin.saveSettings();
+					}),
+			)
+			.setClass(
+				`${
+					emdedCodeFileEnabled
+						? "quartz-syncer-settings-enabled"
+						: "quartz-syncer-settings-disabled"
+				}`,
+			);
+	}
 	/**
 	 * Initializes the Dataview setting.
 	 * This method creates a toggle for enabling/disabling Dataview integration.

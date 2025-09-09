@@ -4,5 +4,7 @@
   "obsidian-excalidraw-plugin",
   "dataview",
   "quartz-syncer",
-  "my_quartz-syncer"
+  "my_quartz-syncer",
+  "shiki-highlighter",
+  "embed-code-file"
 ]

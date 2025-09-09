@@ -55,6 +55,13 @@ export default interface QuartzSyncerSettings {
 	 */
 	useAutoCardLink: boolean;
 	/**
+	 * Enable Embed code File integration.
+	 * This will allow the plugin to use Embed Code File code block in the published notes.
+	 *
+	 * Embed Code documentation: {@link https://github.com/almariah/embed-code-file}
+	 */
+	useEmbedCodeFile: boolean;
+	/**
 	 * Enable Dataview integration.
 	 * This will allow the plugin to use Dataview queries in the published notes.
 	 *
