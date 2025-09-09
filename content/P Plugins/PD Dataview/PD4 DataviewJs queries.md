@@ -1,5 +1,5 @@
 ---
-publish: true
+publish: false
 ---
 ```dataviewjs
 dv.header(2, 'Header 2');

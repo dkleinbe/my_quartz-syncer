@@ -3,7 +3,8 @@ import { Notice, Platform } from "obsidian";
 import QuartzSyncerSettings from "src/models/settings";
 import fs from "fs/promises";
 
-const SNAPSHOT_PATH = "src/test/snapshot/snapshot.md";
+// const SNAPSHOT_PATH = "src/test/snapshot/snapshot.md";
+const SNAPSHOT_PATH = "../my_quartz/content/snapshot.md";
 
 export const generateSyncerSnapshot = async (
 	settings: QuartzSyncerSettings,
