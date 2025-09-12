@@ -10,6 +10,7 @@ import { QuartzSyncerSettingTab } from "./src/views/QuartzSyncerSettingTab";
 import { DataStore } from "src/publishFile/DataStore";
 import Logger from "js-logger";
 import { LocalStorageSettings } from "./src/models/LocalStorageSettings";
+
 /**
  * QuartzSyncer plugin settings.
  * @remarks
@@ -65,6 +66,13 @@ const DEFAULT_SETTINGS: QuartzSyncerSettings = {
 	 * Auto Card Link documentation: {@link https://github.com/nekoshita/obsidian-auto-card-link}
 	 */
 	useAutoCardLink: false,
+	/**
+	 * Enable Embed code File integration.
+	 * This will allow the plugin to use Embed Code File code block in the published notes.
+	 *
+	 * Embed Code documentation: {@link https://github.com/almariah/embed-code-file}
+	 */
+	useEmbedCodeFile: true,
 	/**
 	 * Enable Dataview integration.
 	 * This will allow the plugin to use Dataview queries in the published notes.
@@ -139,7 +147,7 @@ export default class QuartzSyncer extends Plugin {
 		this.appVersion = this.manifest.version;
 
 		this.localStorage.migrate();
-		
+
 		await this.loadSettings();
 		await this.migrateSettings();
 
@@ -230,19 +238,19 @@ export default class QuartzSyncer extends Plugin {
 	 * Migirate credential from regular settings to localstorate
 	 * DKL
 	 */
-    async migrateSettings(): Promise<void> {
+	async migrateSettings(): Promise<void> {
+		if (this.settings.githubUserName !== undefined) {
+			this.localStorage.setUsername(this.settings.githubUserName);
+			this.settings.githubUserName = undefined;
+			await this.saveSettings();
+		}
 
-        if (this.settings.githubUserName !== undefined) {
-            this.localStorage.setUsername(this.settings.githubUserName);
-            this.settings.githubUserName = undefined;
-            await this.saveSettings();
-        }
-        if (this.settings.githubToken !== undefined) {
-            this.localStorage.setPassword(this.settings.githubToken);
-            this.settings.githubToken = undefined;
-            await this.saveSettings();
-        }		
-    }
+		if (this.settings.githubToken !== undefined) {
+			this.localStorage.setPassword(this.settings.githubToken);
+			this.settings.githubToken = undefined;
+			await this.saveSettings();
+		}
+	}
 	/**
 	 * Adds commands to the plugin.
 	 * These commands can be triggered from the command palette or ribbon icon.
@@ -500,7 +508,7 @@ export default class QuartzSyncer extends Plugin {
 				const siteManager = new QuartzSyncerSiteManager(
 					this.app.metadataCache,
 					this.settings,
-					this.localStorage
+					this.localStorage,
 				);
 
 				const publisher = new Publisher(
@@ -524,15 +532,18 @@ export default class QuartzSyncer extends Plugin {
 					siteManager,
 					this.settings,
 				);
+			} catch (error) {
+				console.error(error);
 
-			} catch(error) {
-				console.error(error)
 				if (error instanceof Error) {
-					new Notice("Quartz syncer: something went wrong: " + error.message,2000);
+					new Notice(
+						"Quartz syncer: something went wrong: " + error.message,
+						2000,
+					);
 				}
+
 				return;
 			}
-
 		}
 		this.publishModal.open();
 	}

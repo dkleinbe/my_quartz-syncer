@@ -115,6 +115,11 @@ export class EmbedCodeCompiler {
 			if (!options) {
 				options = 'title="' + title + '"';
 			}
+			//
+			// Escape '$' caracter to avoid unwanted replacement
+			// see replace documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_the_replacement
+			//
+			src = src.replace(/\$/g, "$$$$");
 
 			if (isInsideCalloutDepth > 0) {
 				const calloutSymbol = "> ".repeat(isInsideCalloutDepth);

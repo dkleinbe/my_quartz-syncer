@@ -1,6 +1,20 @@
 ---
 publish: true
 ---
+## Debug
+
+```embed-bash
+PATH: "vault://dot_bash_aliases.bash" 
+```
+
+> [!note]+  .bash_aliases
+>
+>```embed-bash
+>PATH: "vault://dot_bash_aliases.bash" 
+>```
+
+
+
 ## Embed Code from file
 
 
