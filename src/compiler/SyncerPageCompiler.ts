@@ -602,7 +602,26 @@ export class SyncerPageCompiler {
 			const parser = new DOMParser();
 			const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
 			const svgElement = svgDoc.getElementsByTagName("svg")[0];
+			// set width attribute
 			svgElement.setAttribute("width", size);
+			// remove height attribute to keep aspect ratio
+			svgElement.removeAttribute("height");
+
+			fixSvgForXmlSerializer(svgElement);
+			const svgSerializer = new XMLSerializer();
+
+			return svgSerializer.serializeToString(svgDoc);
+		}
+
+		function removeSize(svgText: string) {
+			const parser = new DOMParser();
+			const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+			const svgElement = svgDoc.getElementsByTagName("svg")[0];
+			// remove width attribute
+			svgElement.removeAttribute("width");
+			// remove height attribute to keep aspect ratio
+			svgElement.removeAttribute("height");
+
 			fixSvgForXmlSerializer(svgElement);
 			const svgSerializer = new XMLSerializer();
 
@@ -632,6 +651,8 @@ export class SyncerPageCompiler {
 
 					if (svgText && size) {
 						svgText = setWidth(svgText, size);
+					} else {
+						svgText = removeSize(svgText);
 					}
 
 					if (svgText) {
