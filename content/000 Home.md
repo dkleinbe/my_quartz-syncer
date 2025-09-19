@@ -1,6 +1,6 @@
 ---
-home: true
-publish: true
+home: false
+publish: false
 ---
 ## Welcome
 

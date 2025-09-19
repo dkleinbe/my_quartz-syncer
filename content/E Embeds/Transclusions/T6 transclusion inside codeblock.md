@@ -1,5 +1,5 @@
 ---
-publish: true
+publish: false
 ---
 #known-issue [Issue](https://github.com/oleeskild/quartz-syncer/issues/113)
 

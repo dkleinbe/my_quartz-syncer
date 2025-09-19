@@ -15,6 +15,7 @@ export default interface QuartzSyncerSettings {
 	contentFolder: string;
 	useFullResolutionImages: boolean;
 	applyEmbeds: boolean;
+	applySvgEmbeds: boolean;
 
 	/** Frontmatter settings */
 	publishFrontmatterKey: string;

@@ -628,6 +628,10 @@ export class SyncerPageCompiler {
 			return svgSerializer.serializeToString(svgDoc);
 		}
 
+		if (!this.settings.applySvgEmbeds) {
+			return text;
+		}
+
 		const transcludedSvgs = text.match(TRANSCLUDED_SVG_REGEX);
 
 		if (transcludedSvgs) {

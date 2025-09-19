@@ -27,6 +27,7 @@ const DEFAULT_SETTINGS: QuartzSyncerSettings = {
 	contentFolder: "content",
 	useFullResolutionImages: false,
 	applyEmbeds: true,
+	applySvgEmbeds: false,
 
 	/** Frontmatter settings */
 	publishFrontmatterKey: "publish",

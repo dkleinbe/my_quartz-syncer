@@ -1,5 +1,5 @@
 ---
-publish: true
+publish: false
 ---
 Link to header should keep header link info
 [[000 Home#Welcome]]
