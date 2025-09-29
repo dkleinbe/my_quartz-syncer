@@ -273,16 +273,44 @@ export class SyncerPageCompiler {
 	 *
 	 * @returns A function that takes the text to compile and returns the compiled text.
 	 */
-	private stripAwayCodeFencesAndFrontmatter: TCompilerStep = () => (text) => {
+	private stripAwayCodeFencesAndFrontmatter(
+		text: string,
+	): [string, RegExpMatchArray | null] {
 		let textToBeProcessed = text;
 		textToBeProcessed = textToBeProcessed.replace(EXCALIDRAW_REGEX, "");
-		textToBeProcessed = textToBeProcessed.replace(CODEBLOCK_REGEX, "");
+		//textToBeProcessed = textToBeProcessed.replace(CODEBLOCK_REGEX, "");
+		const codeBlocs = textToBeProcessed.match(CODEBLOCK_REGEX);
+
+		if (codeBlocs) {
+			let i = 0;
+
+			for (const codeBlock of codeBlocs) {
+				textToBeProcessed = textToBeProcessed.replace(
+					codeBlock,
+					">>>>>>" + i++,
+				);
+			}
+		}
+
 		textToBeProcessed = textToBeProcessed.replace(CODE_FENCE_REGEX, "");
 
 		textToBeProcessed = textToBeProcessed.replace(FRONTMATTER_REGEX, "");
 
-		return textToBeProcessed;
-	};
+		return [textToBeProcessed, codeBlocs];
+	}
+
+	private inlineStripedCodeBlocks(
+		text: string,
+		blocks: RegExpMatchArray,
+	): string {
+		let i = 0;
+
+		for (const codeBlock of blocks) {
+			text = text.replace(">>>>>>" + i++, codeBlock);
+		}
+
+		return text;
+	}
 
 	/**
 	 * Converts links in the text to full paths.
@@ -295,8 +323,9 @@ export class SyncerPageCompiler {
 	convertLinksToFullPath: TCompilerStep = (file) => async (text) => {
 		let convertedText = text;
 
-		const textToBeProcessed =
-			await this.stripAwayCodeFencesAndFrontmatter(file)(text);
+		const [textToBeProcessed, codeBlocks] =
+			this.stripAwayCodeFencesAndFrontmatter(text);
+		convertedText = textToBeProcessed;
 
 		const linkedFileRegex = /\[\[(.+?)\]\]/g;
 		const linkedFileMatches = textToBeProcessed.match(linkedFileRegex);
@@ -324,7 +353,7 @@ export class SyncerPageCompiler {
 						: "";
 					let headerPath = "";
 
-					// detect links to headers or blocks
+					// detect links to headers or blocksconvertedText
 					if (linkedFileName.includes("#")) {
 						const headerSplit = linkedFileName.split("#");
 						linkedFileName = headerSplit[0];
@@ -364,6 +393,13 @@ export class SyncerPageCompiler {
 					continue;
 				}
 			}
+		}
+
+		if (codeBlocks) {
+			convertedText = this.inlineStripedCodeBlocks(
+				convertedText,
+				codeBlocks,
+			);
 		}
 
 		return convertedText;
