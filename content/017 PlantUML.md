@@ -12,9 +12,9 @@ publish: true
 
 ```plantuml-svg
 
-state bob [[[white space]]]
+state bob [[white space]]
 state Alice [[nospace]]
-state next [[E Embeds/hereandthere|hereandthere]]
+state next : [[E Embeds/hereandthere|hereandthere]]
 bob -> Alice : hellooo
 
 Alice -> Wonderland: hello
@@ -44,7 +44,7 @@ Alice -> Bob: hello3
 
 ```plantuml-svg
 
-state bob [[[white space]]]
+state bob [[white space]]
 state Alice [[nospace]]
 state next [[E Embeds/hereandthere|hereandthere]]
 bob -> Alice : hellooo

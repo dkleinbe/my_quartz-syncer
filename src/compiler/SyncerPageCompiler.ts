@@ -306,12 +306,45 @@ export class SyncerPageCompiler {
 		let i = 0;
 
 		for (const codeBlock of blocks) {
-			text = text.replace(">>>>>>" + i++, codeBlock);
+			text = text.replace(
+				">>>>>>" + i++,
+				this.convertPlantUMLLinks(codeBlock),
+			);
 		}
 
 		return text;
 	}
 
+	private convertPlantUMLLinks(text: string): string {
+		const plantUmlRegex = /```plantuml.*?\n[\s\S]+?```/g;
+
+		const plantUmlMatches = text.match(plantUmlRegex);
+
+		if (plantUmlMatches) {
+			const linkedFileRegex = /\[\[(.+?)\]\]/g;
+			const linkedFileMatches = text.matchAll(linkedFileRegex);
+
+			if (linkedFileMatches) {
+				for (const linkMatch of linkedFileMatches) {
+					const [linkedFileName, linkDisplayName] =
+						linkMatch[1].split("|");
+
+					text = text.replace(
+						linkMatch[1],
+						encodeURI(linkedFileName) +
+							" {" +
+							linkedFileName +
+							"} " +
+							(linkDisplayName
+								? linkDisplayName
+								: linkedFileName),
+					);
+				}
+			}
+		}
+
+		return text;
+	}
 	/**
 	 * Converts links in the text to full paths.
 	 * It looks for links in the form of [[link]] and converts them to full paths.
