@@ -151,6 +151,7 @@ export class SyncerPageCompiler {
 			this.createTranscludedText(0),
 			this.convertIntegrations,
 			this.convertLinksToFullPath,
+			this.convertPlantUMLLinks,
 			this.removeObsidianComments,
 			this.createSvgEmbeds,
 			this.linkTargeting,
@@ -284,7 +285,7 @@ export class SyncerPageCompiler {
 		const codeFences = textToBeProcessed.match(CODE_FENCE_REGEX) || [];
 		const frontmatter = textToBeProcessed.match(FRONTMATTER_REGEX) || [];
 
-		const matchesToSkip = [...codeBlocks, ...codeFences, ...frontmatter];
+		const matchesToSkip = [...excalidraw, ...codeBlocks, ...codeFences, ...frontmatter];
 
 		if (matchesToSkip) {
 			let i = 0;
@@ -308,42 +309,51 @@ export class SyncerPageCompiler {
 		for (const codeBlock of blocks) {
 			text = text.replace(
 				">>>>>>" + i++,
-				this.convertPlantUMLLinks(codeBlock),
+				codeBlock,
 			);
 		}
 
 		return text;
 	}
 
-	private convertPlantUMLLinks(text: string): string {
-		const plantUmlRegex = /```plantuml.*?\n[\s\S]+?```/g;
+	convertPlantUMLLinks:TCompilerStep = (file) => async (text) => {
+		let replacedText = text;
+		const plantUmlRegex = /```plantuml.*?\n[\s\S]+?```/gms;
 
 		const plantUmlMatches = text.match(plantUmlRegex);
 
-		if (plantUmlMatches) {
-			const linkedFileRegex = /\[\[(.+?)\]\]/g;
-			const linkedFileMatches = text.matchAll(linkedFileRegex);
-
-			if (linkedFileMatches) {
-				for (const linkMatch of linkedFileMatches) {
-					const [linkedFileName, linkDisplayName] =
-						linkMatch[1].split("|");
-
-					text = text.replace(
-						linkMatch[1],
-						encodeURI(linkedFileName) +
-							" {" +
-							linkedFileName +
-							"} " +
-							(linkDisplayName
-								? linkDisplayName
-								: linkedFileName),
-					);
-				}
-			}
+		if (!plantUmlMatches) {
+			return text;
 		}
 
-		return text;
+		for (const plantUmlBlock of plantUmlMatches) {
+
+			replacedText = replacedText.replace(plantUmlBlock, (newPlantUmlBlock) => { 
+				const linkedFileRegex = /\[\[(.+?)\]\]/g;
+				const linkedFileMatches = plantUmlBlock.matchAll(linkedFileRegex);
+
+				if (linkedFileMatches) {
+					for (const linkMatch of linkedFileMatches) {
+						const [linkedFileName, linkDisplayName] =
+							linkMatch[1].split("|");
+
+						newPlantUmlBlock = newPlantUmlBlock.replace(
+							linkMatch[1],
+							encodeURI(linkedFileName) +
+								" {" +
+								linkedFileName +
+								"} " +
+								(linkDisplayName
+									? linkDisplayName
+									: linkedFileName),
+						);
+					}
+				}
+				return newPlantUmlBlock;
+			});
+		}
+
+		return replacedText;
 	}
 	/**
 	 * Converts links in the text to full paths.
