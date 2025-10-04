@@ -275,33 +275,33 @@ export class SyncerPageCompiler {
 	 */
 	private stripAwayCodeFencesAndFrontmatter(
 		text: string,
-	): [string, RegExpMatchArray | null] {
+	): [string, string[] | null] {
 		let textToBeProcessed = text;
 		textToBeProcessed = textToBeProcessed.replace(EXCALIDRAW_REGEX, "");
-		//textToBeProcessed = textToBeProcessed.replace(CODEBLOCK_REGEX, "");
-		const codeBlocs = textToBeProcessed.match(CODEBLOCK_REGEX);
 
-		if (codeBlocs) {
+		const excalidraw = text.match(EXCALIDRAW_REGEX) || []; 
+		const codeBlocks = textToBeProcessed.match(CODEBLOCK_REGEX) || [];
+		const codeFences = textToBeProcessed.match(CODE_FENCE_REGEX) || [];
+		const frontmatter = textToBeProcessed.match(FRONTMATTER_REGEX) || [];
+
+		const matchesToSkip = [...codeBlocks, ...codeFences, ...frontmatter];
+
+		if (matchesToSkip) {
 			let i = 0;
 
-			for (const codeBlock of codeBlocs) {
+			for (const match of matchesToSkip) {
 				textToBeProcessed = textToBeProcessed.replace(
-					codeBlock,
+					match,
 					">>>>>>" + i++,
 				);
 			}
 		}
-
-		textToBeProcessed = textToBeProcessed.replace(CODE_FENCE_REGEX, "");
-
-		textToBeProcessed = textToBeProcessed.replace(FRONTMATTER_REGEX, "");
-
-		return [textToBeProcessed, codeBlocs];
+		return [textToBeProcessed, matchesToSkip];
 	}
 
 	private inlineStripedCodeBlocks(
 		text: string,
-		blocks: RegExpMatchArray,
+		blocks: string[],
 	): string {
 		let i = 0;
 

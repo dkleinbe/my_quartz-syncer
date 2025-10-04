@@ -1,5 +1,7 @@
 ---
 publish: true
+tags:
+  - test_tag
 ---
 
 [[hereandthere]]
