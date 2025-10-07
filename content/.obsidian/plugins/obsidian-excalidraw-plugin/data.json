@@ -79,7 +79,7 @@
   "autoexportPNG": false,
   "autoExportLightAndDark": false,
   "autoexportExcalidraw": false,
-  "embedType": "excalidraw",
+  "embedType": "SVG",
   "embedMarkdownCommentLinks": true,
   "embedWikiLink": true,
   "syncExcalidraw": false,

@@ -677,6 +677,20 @@ export class SyncerPageCompiler {
 	 * @returns A function that takes the text to compile and returns the compiled text.
 	 */
 	createSvgEmbeds: TCompilerStep = (file) => async (text) => {
+
+		function setPanZoom(svgText: string) {
+			const parser = new DOMParser();
+			const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+			const svgElement = svgDoc.getElementsByTagName("svg")[0];
+			const svgClass = svgElement.getAttribute("class")
+			svgElement.setAttribute("class", svgClass + " panzoom")
+
+			fixSvgForXmlSerializer(svgElement);
+			const svgSerializer = new XMLSerializer();
+
+			return svgSerializer.serializeToString(svgDoc);
+		}
+
 		function setWidth(svgText: string, size: string): string {
 			const parser = new DOMParser();
 			const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
@@ -731,8 +745,10 @@ export class SyncerPageCompiler {
 					}
 
 					let svgText = await this.vault.read(linkedFile);
-
-					if (svgText && size) {
+					if (svgText && size == "panzoom")
+					{
+						svgText = setPanZoom(svgText)
+					} else if (svgText && size) {
 						svgText = setWidth(svgText, size);
 					} else {
 						svgText = removeSize(svgText);
