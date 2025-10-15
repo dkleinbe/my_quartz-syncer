@@ -280,12 +280,17 @@ export class SyncerPageCompiler {
 		let textToBeProcessed = text;
 		textToBeProcessed = textToBeProcessed.replace(EXCALIDRAW_REGEX, "");
 
-		const excalidraw = text.match(EXCALIDRAW_REGEX) || []; 
+		const excalidraw = text.match(EXCALIDRAW_REGEX) || [];
 		const codeBlocks = textToBeProcessed.match(CODEBLOCK_REGEX) || [];
 		const codeFences = textToBeProcessed.match(CODE_FENCE_REGEX) || [];
 		const frontmatter = textToBeProcessed.match(FRONTMATTER_REGEX) || [];
 
-		const matchesToSkip = [...excalidraw, ...codeBlocks, ...codeFences, ...frontmatter];
+		const matchesToSkip = [
+			...excalidraw,
+			...codeBlocks,
+			...codeFences,
+			...frontmatter,
+		];
 
 		if (matchesToSkip) {
 			let i = 0;
@@ -297,26 +302,21 @@ export class SyncerPageCompiler {
 				);
 			}
 		}
+
 		return [textToBeProcessed, matchesToSkip];
 	}
 
-	private inlineStripedCodeBlocks(
-		text: string,
-		blocks: string[],
-	): string {
+	private inlineStripedCodeBlocks(text: string, blocks: string[]): string {
 		let i = 0;
 
 		for (const codeBlock of blocks) {
-			text = text.replace(
-				">>>>>>" + i++,
-				codeBlock,
-			);
+			text = text.replace(">>>>>>" + i++, codeBlock);
 		}
 
 		return text;
 	}
 
-	convertPlantUMLLinks:TCompilerStep = (file) => async (text) => {
+	convertPlantUMLLinks: TCompilerStep = (file) => async (text) => {
 		let replacedText = text;
 		const plantUmlRegex = /```plantuml.*?\n[\s\S]+?```/gms;
 
@@ -327,34 +327,39 @@ export class SyncerPageCompiler {
 		}
 
 		for (const plantUmlBlock of plantUmlMatches) {
+			replacedText = replacedText.replace(
+				plantUmlBlock,
+				(newPlantUmlBlock) => {
+					const linkedFileRegex = /\[\[(.+?)\]\]/g;
 
-			replacedText = replacedText.replace(plantUmlBlock, (newPlantUmlBlock) => { 
-				const linkedFileRegex = /\[\[(.+?)\]\]/g;
-				const linkedFileMatches = plantUmlBlock.matchAll(linkedFileRegex);
+					const linkedFileMatches =
+						plantUmlBlock.matchAll(linkedFileRegex);
 
-				if (linkedFileMatches) {
-					for (const linkMatch of linkedFileMatches) {
-						const [linkedFileName, linkDisplayName] =
-							linkMatch[1].split("|");
+					if (linkedFileMatches) {
+						for (const linkMatch of linkedFileMatches) {
+							const [linkedFileName, linkDisplayName] =
+								linkMatch[1].split("|");
 
-						newPlantUmlBlock = newPlantUmlBlock.replace(
-							linkMatch[1],
-							encodeURI(linkedFileName) +
-								" {" +
-								linkedFileName +
-								"} " +
-								(linkDisplayName
-									? linkDisplayName
-									: linkedFileName),
-						);
+							newPlantUmlBlock = newPlantUmlBlock.replace(
+								linkMatch[1],
+								encodeURI(linkedFileName) +
+									" {" +
+									linkedFileName +
+									"} " +
+									(linkDisplayName
+										? linkDisplayName
+										: linkedFileName),
+							);
+						}
 					}
-				}
-				return newPlantUmlBlock;
-			});
+
+					return newPlantUmlBlock;
+				},
+			);
 		}
 
 		return replacedText;
-	}
+	};
 	/**
 	 * Converts links in the text to full paths.
 	 * It looks for links in the form of [[link]] and converts them to full paths.
@@ -677,13 +682,12 @@ export class SyncerPageCompiler {
 	 * @returns A function that takes the text to compile and returns the compiled text.
 	 */
 	createSvgEmbeds: TCompilerStep = (file) => async (text) => {
-
 		function setPanZoom(svgText: string) {
 			const parser = new DOMParser();
 			const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
 			const svgElement = svgDoc.getElementsByTagName("svg")[0];
-			const svgClass = svgElement.getAttribute("class")
-			svgElement.setAttribute("class", svgClass + " panzoom")
+			const svgClass = svgElement.getAttribute("class");
+			svgElement.setAttribute("class", svgClass + " panzoom");
 
 			fixSvgForXmlSerializer(svgElement);
 			const svgSerializer = new XMLSerializer();
@@ -695,8 +699,13 @@ export class SyncerPageCompiler {
 			const parser = new DOMParser();
 			const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
 			const svgElement = svgDoc.getElementsByTagName("svg")[0];
-			// set width attribute
-			svgElement.setAttribute("width", size);
+
+			// set max-width attribute to size to enable resizing
+			svgElement.setAttribute(
+				"style",
+				"max-width: " + size + "px; height: auto;",
+			);
+			svgElement.removeAttribute("width");
 			// remove height attribute to keep aspect ratio
 			svgElement.removeAttribute("height");
 
@@ -745,9 +754,9 @@ export class SyncerPageCompiler {
 					}
 
 					let svgText = await this.vault.read(linkedFile);
-					if (svgText && size == "panzoom")
-					{
-						svgText = setPanZoom(svgText)
+
+					if (svgText && size == "panzoom") {
+						svgText = setPanZoom(svgText);
 					} else if (svgText && size) {
 						svgText = setWidth(svgText, size);
 					} else {
