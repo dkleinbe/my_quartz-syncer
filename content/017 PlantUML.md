@@ -4,6 +4,10 @@ tags:
   - test_tag
 ---
 
+
+![[Induction - Vision périphérique 2025-10-14 17.48.22.excalidraw.svg|panzoom]]
+
+
 [[hereandthere]]
 
 [[E Embeds/hereandthere|hereandthere]]
