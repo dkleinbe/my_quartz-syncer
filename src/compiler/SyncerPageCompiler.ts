@@ -310,7 +310,11 @@ export class SyncerPageCompiler {
 		let i = 0;
 
 		for (const codeBlock of blocks) {
-			text = text.replace(">>>>>>" + i++, codeBlock);
+			//
+			// Escape '$' caracter to avoid unwanted replacement
+			// see replace documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_the_replacement
+			//
+			text = text.replace(">>>>>>" + i++, codeBlock.replace(/\$/g, "$$$$"));
 		}
 
 		return text;
