@@ -298,7 +298,7 @@ export class SyncerPageCompiler {
 			for (const match of matchesToSkip) {
 				textToBeProcessed = textToBeProcessed.replace(
 					match,
-					">>>>>>" + i++,
+					">>>>>>" + i++ + "<<<<<<",
 				);
 			}
 		}
@@ -314,7 +314,7 @@ export class SyncerPageCompiler {
 			// Escape '$' caracter to avoid unwanted replacement
 			// see replace documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_the_replacement
 			//
-			text = text.replace(">>>>>>" + i++, codeBlock.replace(/\$/g, "$$$$"));
+			text = text.replace(">>>>>>" + i++ + "<<<<<<", codeBlock.replace(/\$/g, "$$$$"));
 		}
 
 		return text;
